@@ -1,27 +1,21 @@
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 import { Route, Link } from "react-router-dom";
 import { loadData } from "../utils/loadData";
 import Issue from "./Issue";
 
-class IssueList extends Component {
-    state = {
-        issues: [],
-    };
+const IssueList = props => {
+    const [issues, setIssues] = useState([]);
 
-    async componentDidMount() {
-        const issues = await loadData(
-        `https://api.github.com/repos/facebook/create-react-app/issues`
-        );
+    useEffect(() => {
+        (async function () {
+            const issues = await loadData(
+                `https://api.github.com/repos/facebook/create-react-app/issues`
+                );
+                setIssues(issues);
+        })(); //IFFE inside Hook or something
+    }, [setIssues]);
 
-        this.setState({
-        issues,
-        });
-    }
-
-    render() {
-        const { issues } = this.state;
-
-        return (
+    return (
         <>
             {!!issues.length ? (
             <>
@@ -48,7 +42,8 @@ class IssueList extends Component {
             )}
         </>
         );
-    }
+
 }
+
 
 export default IssueList;
