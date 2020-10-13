@@ -1,35 +1,53 @@
-import React, { Component } from "react";
-import { loadData } from "../utils/loadData";
-import Issue from "./Issue";
+import React, {Component} from 'react';
+import { Route, Link } from "react-router-dom";
+import Issue from './Issue';
+
 
 class IssueList extends Component {
     state = {
-        issues: [],
-    };
+        issueData: [],
+    }
+    async loadData() {
+        const response = await fetch("https://api.github.com/repos/facebook/create-react-app/issues");
+        const data = await response.json();
+        return data;
+    }
 
     async componentDidMount() {
-        const issues = await loadData(
-        `https://api.github.com/repos/facebook/create-react-app/issues`
-        );
-
-        this.setState({
-        issues,
-        });
+        const issueData = await this.loadData();
+            this.setState({
+                issueData: issueData,
+            });
     }
 
     render() {
-        const { issues } = this.state;
-
-        return (
-        <ul>
-            {!!issues.length ? (
-            issues.map((issue) => <Issue key={issue.id} issue={issue} />)
-            ) : (
-            <li>No Issues</li>
-            )}
-        </ul>
-        );
-    }
-    }
-
-export default IssueList;
+        const { issueData } = this.state;
+            return (
+                <>
+                {!!issueData.length ? (
+                    <>
+                        <h1>GiHub Issues List</h1>
+                        <Route exact path ="/">
+                            <ul>
+                                {issueData.map((issue) => {
+                                    return (
+                                        <li key={issue.id}>
+                                            {issue.title}
+                                            <a href={`/issue/${issue.number}`}>View Details</a>
+                                        </li>);
+                                })}
+                            </ul>
+                        </Route>
+                        <Route path={`/issue/:issue_number`}>
+                            <h2>This will be an issue</h2>
+                        </Route>
+                    </>
+                    ) : (
+                        <p>Fetching issues ...</p>
+                    )}
+                </>
+            );
+            }
+        }
+    
+    export default IssueList;
