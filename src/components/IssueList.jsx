@@ -1,42 +1,35 @@
-import React, {Component} from 'react';
-
-import Issue from './Issue';
-
+import React, { Component } from "react";
+import { loadData } from "../utils/loadData";
+import Issue from "./Issue";
 
 class IssueList extends Component {
     state = {
-        issueData: [],
-    }
-    async loadData() {
-        const response = await fetch("https://api.github.com/repos/facebook/create-react-app/issues");
-        const data = await response.json();
-        console.log("The data is: ", data)
-        return data;
-    }
+        issues: [],
+    };
 
     async componentDidMount() {
-        const issueData = await this.loadData();
-            this.setState({
-                issueData: issueData,
-            });
+        const issues = await loadData(
+        `https://api.github.com/repos/facebook/create-react-app/issues`
+        );
+
+        this.setState({
+        issues,
+        });
     }
 
     render() {
-        const { issueData } = this.state;
-        console.log("Issue data: ", issueData);
+        const { issues } = this.state;
+
         return (
-            <>
-                <div>
-                    {
-                        issueData.map((issue, index) => (
-                            <ul>
-                                <li key={issue.id}><Issue issue = {issue} /></li>
-                            </ul>
-                        ))
-                    }
-                </div>
-            </>
+        <ul>
+            {!!issues.length ? (
+            issues.map((issue) => <Issue key={issue.id} issue={issue} />)
+            ) : (
+            <li>No Issues</li>
+            )}
+        </ul>
         );
     }
-}
+    }
+
 export default IssueList;
