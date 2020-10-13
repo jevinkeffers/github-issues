@@ -1,53 +1,54 @@
-import React, {Component} from 'react';
+import React, { Component } from "react";
 import { Route, Link } from "react-router-dom";
-import Issue from './Issue';
-
+import { loadData } from "../utils/loadData";
+import Issue from "./Issue";
 
 class IssueList extends Component {
     state = {
-        issueData: [],
-    }
-    async loadData() {
-        const response = await fetch("https://api.github.com/repos/facebook/create-react-app/issues");
-        const data = await response.json();
-        return data;
-    }
+        issues: [],
+    };
 
     async componentDidMount() {
-        const issueData = await this.loadData();
-            this.setState({
-                issueData: issueData,
-            });
+        const issues = await loadData(
+        `https://api.github.com/repos/facebook/create-react-app/issues`
+        );
+
+        this.setState({
+        issues,
+        });
     }
 
     render() {
-        const { issueData } = this.state;
-            return (
-                <>
-                {!!issueData.length ? (
-                    <>
-                        <h1>GiHub Issues List</h1>
-                        <Route exact path ="/">
-                            <ul>
-                                {issueData.map((issue) => {
-                                    return (
-                                        <li key={issue.id}>
-                                            {issue.title}
-                                            <a href={`/issue/${issue.number}`}>View Details</a>
-                                        </li>);
-                                })}
-                            </ul>
-                        </Route>
-                        <Route path={`/issue/:issue_number`}>
-                            <h2>This will be an issue</h2>
-                        </Route>
-                    </>
-                    ) : (
-                        <p>Fetching issues ...</p>
-                    )}
-                </>
-            );
-            }
-        }
-    
-    export default IssueList;
+        const { issues } = this.state;
+
+        return (
+        <>
+            {!!issues.length ? (
+            <>
+                <h1>Github Issues List</h1>
+                <Route exact path="/">
+                <ul>
+                    {issues.map((issue) => {
+                    return (
+                        <li key={issue.id}>
+                        {issue.title}
+                        <Link to={`/issue/${issue.number}`}>View Details</Link>
+                        </li>
+                    );
+                    })}
+                </ul>
+                </Route>
+                <Route path={`/issue/:issue_number`}>
+                <Link to="/">Return to List</Link>
+                <Issue issues={issues} />
+                </Route>
+            </>
+            ) : (
+            <p>Fetching issues...</p>
+            )}
+        </>
+        );
+    }
+}
+
+export default IssueList;
